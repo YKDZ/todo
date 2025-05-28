@@ -1,0 +1,30 @@
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://user:pass@localhost:5432/todo?schema=public"
+}
+
+generator client {
+  provider        = "prisma-client"
+  previewFeatures = ["fullTextSearchPostgres"]
+  output          = "../src/server/generated/prisma"
+  moduleFormat    = "esm"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  Todos Todo[]
+}
+
+model Todo {
+  id          Int      @id @default(autoincrement())
+  text        String
+  isCompleted Boolean  @default(false)
+  isImportant Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+
+  creatorId String
+  Creator   User   @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+}

@@ -4,6 +4,7 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
+    "allowImportingTsExtensions": true,
     "skipLibCheck": true,
     "sourceMap": true,
     "module": "ESNext",
@@ -19,7 +20,12 @@
       "vite/client"
     ],
     "jsx": "react-jsx",
-    "jsxImportSource": "vue"
+    "jsxImportSource": "vue",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    }
   },
   "exclude": [
     "dist"
