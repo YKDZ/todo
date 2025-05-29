@@ -17,7 +17,7 @@
     "@universal-middleware/core": "^0.4.7",
     "@universal-middleware/hono": "^0.4.11",
     "@vitejs/plugin-vue": "^5.2.4",
-    "@vue/compiler-sfc": "^3.5.14",
+    "@vue/compiler-sfc": "^3.5.16",
     "@vue/server-renderer": "^3.5.14",
     "@vueuse/core": "^13.2.0",
     "@vueuse/integrations": "^13.2.0",
