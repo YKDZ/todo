@@ -19,7 +19,7 @@
     "@vitejs/plugin-vue": "^5.2.4",
     "@vue/compiler-sfc": "^3.5.14",
     "@vue/server-renderer": "^3.5.14",
-    "@vueuse/core": "^13.2.0",
+    "@vueuse/core": "^13.3.0",
     "@vueuse/integrations": "^13.2.0",
     "dotenv": "^16.5.0",
     "hono": "^4.7.10",
