@@ -1,4 +1,5 @@
 {
+  "name": "todo",
   "scripts": {
     "dev": "vike dev",
     "build": "vike build",
