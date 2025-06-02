@@ -22,7 +22,7 @@
     "@vueuse/core": "^13.2.0",
     "@vueuse/integrations": "^13.2.0",
     "dotenv": "^16.5.0",
-    "hono": "^4.7.10",
+    "hono": "^4.7.11",
     "pinia": "^3.0.2",
     "universal-cookie": "^7.2.2",
     "unocss": "^66.1.2",
