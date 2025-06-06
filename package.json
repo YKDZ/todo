@@ -38,7 +38,7 @@
     "@hono/vite-dev-server": "^0.19.1",
     "@iconify-json/fluent": "^1.2.22",
     "@iconify-json/mdi": "^1.2.3",
-    "@types/node": "^18.19.103",
+    "@types/node": "^22.15.30",
     "cross-env": "^7.0.3",
     "eslint": "^9.25.1",
     "eslint-config-prettier": "^10.1.2",
