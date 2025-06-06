@@ -37,7 +37,7 @@ apply(app, {
     let isFirst = false;
 
     if (!userId || (userId && !user)) {
-      user = await useSSCTRPC().user.askNew();
+      user = await useSSCTRPC({ setCookie: helpers.setCookie }).user.askNew();
       userId = user.id;
       isFirst = true;
     }
