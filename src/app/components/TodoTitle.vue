@@ -7,11 +7,11 @@ const { uncompletedAmount } = storeToRefs(useTodoStore());
 </script>
 
 <template>
-  <div class="flex items-center w-full gap-2">
+  <div class="flex gap-2 w-full items-center">
     <ThemeSwictcher />
-    <h3 class="inline-flex items-end gap-2">
-      <span class="font-bold text-2xl text-highlight-content-darker">任务</span>
-      <span v-if="uncompletedAmount > 0" class="text-highlight-content leading-none pb-0.8 text-xs"
+    <h3 class="inline-flex gap-2 items-end">
+      <span class="text-2xl text-highlight-content-darker font-bold">任务</span>
+      <span v-if="uncompletedAmount > 0" class="text-xs text-highlight-content leading-none pb-0.8"
         >{{ uncompletedAmount }} 个任务未完成...</span
       >
     </h3>

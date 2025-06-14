@@ -6,11 +6,9 @@ import vikeServer from "vike-server/config";
 export default {
   Layout: Root,
 
-  title: "TODO",
-
   server: "@/server/index.ts",
 
-  passToClient: ["user", "userId", "isFirst", "_piniaInitState"],
+  passToClient: ["user", "_piniaInitState"],
 
   filesystemRoutingRoot: "/",
 

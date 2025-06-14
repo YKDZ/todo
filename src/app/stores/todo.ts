@@ -1,5 +1,5 @@
 import { trpc } from "@/server/trpc/client";
-import { Todo } from "@/shared/schema/prisma";
+import type { Todo } from "@/shared/schema/prisma";
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 
@@ -7,24 +7,31 @@ export const useTodoStore = defineStore("todo", () => {
   const todos = ref<Todo[]>([]);
   const selectedTodoIds = ref<number[]>([]);
 
+  const currentTodo = computed<Todo | null>(() => {
+    if (selectedTodoIds.value.length !== 1) return null;
+    return todos.value.find((todo) => todo.id === selectedTodoIds.value[0]) ?? null;
+  });
+
   const initTodos = (...todosInit: Todo[]) => {
     todos.value = todosInit;
   };
 
-  const updateTodos = async (userId: string) => {
-    await trpc.todo.listOwned.query({ userId }).then((tds) => {
+  const updateTodos = async () => {
+    await trpc.todo.listOwned.query().then((tds) => {
       todos.value = tds;
     });
   };
 
-  const deleteTodo = async (id: number) => {
-    todos.value.splice(
-      todos.value.findIndex((todo) => todo.id === id),
-      1,
-    );
+  const deleteTodos = async (...ids: number[]) => {
+    for (const id of ids) {
+      todos.value.splice(
+        todos.value.findIndex((todo) => todo.id === id),
+        1,
+      );
+    }
   };
 
-  const addTodos = (...todosToAdd: Todo[]) => {
+  const upsertTodos = (...todosToAdd: Todo[]) => {
     for (const todo of todosToAdd) {
       if (!todo) continue;
 
@@ -65,6 +72,12 @@ export const useTodoStore = defineStore("todo", () => {
     return todos.value.filter((todo) => todo.isCompleted).length;
   });
 
+  const selectTodo = (id: number) => {
+    const index = selectedTodoIds.value.findIndex((i) => i === id);
+    if (index === -1) selectedTodoIds.value.push(id);
+    else selectedTodoIds.value.splice(index, 1);
+  };
+
   return {
     todos,
     selectedTodoIds,
@@ -72,9 +85,11 @@ export const useTodoStore = defineStore("todo", () => {
     sortedUncompletedTodos,
     uncompletedAmount,
     completedAmount,
-    deleteTodo,
+    currentTodo,
+    deleteTodos,
     initTodos,
-    addTodos,
+    upsertTodos,
     updateTodos,
+    selectTodo,
   };
 });

@@ -1,0 +1,24 @@
+<script setup lang="ts">
+import AuthError from "@/app/components/AuthError.vue";
+import { useData } from "vike-vue/useData";
+import { ref } from "vue";
+import logoUrl from "@/app/assets/logo.png";
+import type { Data } from "./+data";
+import AuthPreHandler from "@/app/components/AuthPreHandler.vue";
+import type { AuthMethod } from "@/shared/schema/auth";
+
+const data = useData<Data>();
+
+const methods = ref<AuthMethod[]>(data.methods);
+</script>
+
+<template>
+  <div class="px-10 flex flex-col gap-4 w-full items-center md:px-0 md:w-1/3">
+    <img :src="logoUrl" class="w-12" />
+    <h1 class="text-3xl select-none">登录到 <span class="font-bold">TODO</span></h1>
+    <AuthError class="-mt-1" />
+    <div class="flex flex-col gap-1.5 w-full">
+      <AuthPreHandler v-for="method in methods" :key="method.providerId" :method />
+    </div>
+  </div>
+</template>

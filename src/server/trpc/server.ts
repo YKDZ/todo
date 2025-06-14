@@ -1,5 +1,5 @@
 import { initTRPC, TRPCError } from "@trpc/server";
-import { HttpContext } from "./context";
+import type { HttpContext } from "./context";
 
 const t = initTRPC.context<HttpContext>().create();
 
@@ -7,15 +7,16 @@ export const { createCallerFactory, router } = t;
 export const publicProcedure = t.procedure;
 
 export const authedProcedure = t.procedure.use(async ({ ctx, next }) => {
-  const { userId } = ctx;
-  if (!userId)
+  const { user, sessionId } = ctx;
+  if (!user || !sessionId)
     throw new TRPCError({
       code: "UNAUTHORIZED",
-      message: "You need to declare who you are to access this procedure",
+      message: "You need to log in to access this procedure",
     });
   return await next({
     ctx: {
-      userId: userId!,
+      user,
+      sessionId,
     },
   });
 });

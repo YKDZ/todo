@@ -1,10 +1,10 @@
 import { useSSCTRPC } from "@/server/trpc/sscClient";
-import { PageContextServer } from "vike/types";
+import type { PageContextServer } from "vike/types";
 
-export const data = async ({ user, userId }: PageContextServer) => {
-  if (!userId) return { todos: [] };
+export const data = async (ctx: PageContextServer) => {
+  if (!ctx.user) return { todos: [] };
 
-  const todos = await useSSCTRPC({ user, userId }).todo.listOwned({ userId });
+  const todos = await useSSCTRPC(ctx).todo.listOwned();
 
   return { todos };
 };

@@ -1,4 +1,5 @@
 import { PrismaPg } from "@prisma/adapter-pg";
+import "dotenv/config";
 import { PrismaClient } from "../generated/prisma";
 
 export class PrismaDB {
@@ -9,10 +10,10 @@ export class PrismaDB {
     if (PrismaDB.instance) throw Error("PrismaDB can only have a single instance");
 
     const adapter = new PrismaPg({
-      connectionString: import.meta.env.DATABASE_URL,
+      connectionString: process.env.DATABASE_URL,
     });
-    // this.client = new PrismaClient({ adapter });
-    this.client = new PrismaClient();
+    this.client = new PrismaClient({ adapter });
+
     PrismaDB.instance = this;
   }
 
@@ -22,6 +23,10 @@ export class PrismaDB {
 
   static async disconnect() {
     await PrismaDB.instance.client.$disconnect();
+  }
+
+  static async ping() {
+    await prisma.$queryRaw`SELECT 1`;
   }
 }
 

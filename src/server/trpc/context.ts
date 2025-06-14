@@ -1,6 +1,7 @@
-import { userFromId } from "../utils/user";
+import { userFromSessionId } from "../utils/user";
 import { createHTTPHelpers } from "../utils/http-helpers";
-import { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
+import type { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
+import { PluginRegistry } from "../plugin/plugin-registry";
 
 export const createHttpContext = async ({
   req,
@@ -8,13 +9,16 @@ export const createHttpContext = async ({
 }: Pick<FetchCreateContextFnOptions, "req" | "resHeaders">) => {
   const helpers = createHTTPHelpers(req, resHeaders);
 
-  const userId = helpers.getCookie("userId") ?? null;
-  const user = userId ? await userFromId(userId) : null;
+  const sessionId = helpers.getCookie("sessionId") ?? null;
+
+  const user = sessionId ? await userFromSessionId(sessionId) : null;
 
   return {
-    userId,
     user,
+    sessionId,
+    pluginRegistry: PluginRegistry.getInstance(),
     ...helpers,
+    helpers,
   };
 };
 
@@ -22,7 +26,7 @@ export type HttpContext = Awaited<ReturnType<typeof createHttpContext>>;
 
 export const EMPTY_CONTEXT = {
   user: null,
-  userId: null,
+  sessionId: "",
   setCookie: () => {},
   getCookie: () => "",
   getQueryParam: () => "",

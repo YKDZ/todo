@@ -1,6 +1,7 @@
 services:
   postgres:
     image: pgvector/pgvector:pg17
+    container_name: todo_postgresql
     ports:
       - "127.0.0.1:5432:5432"
     environment:
@@ -8,3 +9,16 @@ services:
       POSTGRES_PASSWORD: pass
       POSTGRES_DB: todo
     user: "postgres:postgres"
+  redis:
+    image: redis
+    container_name: todo_redis
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - redis-cli ping | grep PONG
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 3s
+    ports:
+      - 6379:6379

@@ -1,8 +1,9 @@
 import { prisma } from "@/server/db/prisma";
 import { authedProcedure, router } from "../server";
 import { z } from "zod/v4";
+import type { Todo } from "@/shared/schema/prisma";
 import { TodoSchema } from "@/shared/schema/prisma";
-import { TRPCError } from "@trpc/server";
+import { TodoDataSchema } from "@/shared/schema/misc";
 
 export const todoRouter = router({
   create: authedProcedure
@@ -13,7 +14,7 @@ export const todoRouter = router({
     )
     .output(TodoSchema)
     .mutation(async ({ ctx, input }) => {
-      const { userId } = ctx;
+      const { user } = ctx;
       const { text } = input;
 
       return TodoSchema.parse(
@@ -21,79 +22,75 @@ export const todoRouter = router({
           data: {
             text,
             Creator: {
-              connectOrCreate: {
-                where: {
-                  id: userId,
-                },
-                create: {
-                  id: userId,
-                },
+              connect: {
+                id: user.id,
               },
             },
           },
         }),
       );
     }),
-  listOwned: authedProcedure
-    .input(
-      z.object({
-        userId: z.cuid2(),
-      }),
-    )
-    .output(z.array(TodoSchema))
-    .query(async ({ input }) => {
-      const { userId } = input;
+  listOwned: authedProcedure.output(z.array(TodoSchema)).query(async ({ ctx }) => {
+    const { user } = ctx;
 
-      return z.array(TodoSchema).parse(
-        await prisma.todo.findMany({
-          where: {
-            creatorId: userId,
-          },
-          orderBy: {
-            updatedAt: "asc",
-          },
-        }),
-      );
-    }),
+    return z.array(TodoSchema).parse(
+      await prisma.todo.findMany({
+        where: {
+          creatorId: user.id,
+        },
+        orderBy: {
+          updatedAt: "asc",
+        },
+      }),
+    );
+  }),
   update: authedProcedure
     .input(
       z.object({
-        id: z.number().int(),
-        isImportant: z.boolean().optional(),
-        isCompleted: z.boolean().optional(),
-        text: z.string().min(1),
+        datas: z.array(TodoDataSchema),
       }),
     )
-    .output(TodoSchema)
+    .output(z.array(TodoSchema))
     .mutation(async ({ input }) => {
-      const { id, isCompleted, isImportant, text } = input;
+      const { datas } = input;
 
-      return TodoSchema.parse(
-        await prisma.todo.update({
-          where: {
-            id,
-          },
-          data: {
-            isCompleted,
-            isImportant,
-            text,
-          },
+      return z.array(TodoSchema).parse(
+        await prisma.$transaction(async (tx) => {
+          const result: Todo[] = [];
+          for (const { id, isCompleted, isImportant, deadline, text } of datas) {
+            result.push(
+              await tx.todo.update({
+                where: {
+                  id,
+                },
+                data: {
+                  isCompleted,
+                  isImportant,
+                  text,
+                  deadline: deadline !== undefined ? (deadline === null ? null : new Date(deadline)) : undefined,
+                },
+              }),
+            );
+          }
+          return result;
         }),
       );
     }),
   delete: authedProcedure
     .input(
       z.object({
-        id: z.number().int(),
+        ids: z.array(z.int()),
       }),
     )
     .output(z.void())
     .mutation(async ({ input }) => {
-      const { id } = input;
+      const { ids } = input;
 
-      await prisma.todo.delete({
+      await prisma.todo.deleteMany({
         where: {
-          id,
+          id: {
+            in: ids,
+          },
         },
       });
     }),

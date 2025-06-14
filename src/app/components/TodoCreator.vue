@@ -7,7 +7,7 @@ import { trpc } from "@/server/trpc/client";
 import { useToastStore } from "../stores/toast";
 
 const { info, warn } = useToastStore();
-const { addTodos } = useTodoStore();
+const { upsertTodos } = useTodoStore();
 
 const text = ref("");
 
@@ -28,7 +28,7 @@ const handleCreate = async () => {
     })
     .then((todo) => {
       text.value = "";
-      addTodos(todo);
+      upsertTodos(todo);
       info("成功创建任务");
     })
     .finally(() => (isProcessing.value = false));
@@ -36,12 +36,12 @@ const handleCreate = async () => {
 </script>
 
 <template>
-  <div class="flex gap-1 items-center w-full">
+  <div class="flex gap-1 w-full items-center">
     <Input v-model="text" full-width icon="i-mdi:book" placeholder="任务内容" />
     <Button
       :is-processing
       icon="i-mdi:plus"
-      magic-key="Shift+Enter"
+      magic-key="Control+Enter"
       @click="handleCreate"
       @magic-click="handleCreate"
     />

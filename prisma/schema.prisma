@@ -5,25 +5,47 @@ datasource db {
 
 generator client {
   provider        = "prisma-client"
-  previewFeatures = ["fullTextSearchPostgres"]
+  previewFeatures = ["fullTextSearchPostgres", "driverAdapters", "queryCompiler"]
   output          = "../src/server/generated/prisma"
   moduleFormat    = "esm"
 }
 
 model User {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
+  id   String @id @default(cuid())
+  name String @unique
 
-  Todos Todo[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  Todos    Todo[]
+  Accounts Account[]
+}
+
+model Account {
+  type              String
+  provider          String
+  providedAccountId String
+  meta              Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  userId String
+  User   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providedAccountId])
+  @@unique([userId, provider])
 }
 
 model Todo {
-  id          Int      @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   text        String
-  isCompleted Boolean  @default(false)
-  isImportant Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @default(now()) @updatedAt
+  isCompleted Boolean   @default(false)
+  isImportant Boolean   @default(false)
+  deadline    DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 
   creatorId String
   Creator   User   @relation(fields: [creatorId], references: [id], onDelete: Cascade)

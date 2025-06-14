@@ -1,26 +1,20 @@
 import eslint from "@eslint/js";
-import prettier from "eslint-plugin-prettier/recommended";
+import unocss from "@unocss/eslint-config/flat";
 import pluginVue from "eslint-plugin-vue";
 import globals from "globals";
+import type { ConfigArray } from "typescript-eslint";
 import tseslint from "typescript-eslint";
 import vueParser from "vue-eslint-parser";
+import eslintConfigPrettier from "eslint-config-prettier/flat";
 
 export default tseslint.config(
   {
-    ignores: [
-      "dist/*",
-      // Temporary compiled files
-      "**/*.ts.build-*.mjs",
-
-      // JS files at the root of the project
-      "*.js",
-      "*.cjs",
-      "*.mjs",
-      "src/server/generated",
-    ],
+    ignores: ["**/dist/**", "**/generated/prisma/**", "*.js", "*.cjs"],
   },
+
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
+
   {
     languageOptions: {
       parserOptions: {
@@ -43,7 +37,7 @@ export default tseslint.config(
   },
 
   {
-    files: ["**/*.vue"],
+    files: ["**/*.vue", "**/*.ts"],
     languageOptions: {
       parser: vueParser,
       parserOptions: {
@@ -51,6 +45,25 @@ export default tseslint.config(
         sourceType: "module",
         ecmaVersion: "latest",
       },
+    },
+    rules: {
+      "@typescript-eslint/consistent-type-imports": "error",
+      "@typescript-eslint/naming-convention": [
+        "error",
+        {
+          selector: "variable",
+          format: ["camelCase"],
+        },
+        {
+          selector: "variable",
+          modifiers: ["const"],
+          format: ["UPPER_CASE", "camelCase", "PascalCase"],
+        },
+        {
+          selector: "typeLike",
+          format: ["PascalCase"],
+        },
+      ],
     },
   },
 
@@ -62,6 +75,13 @@ export default tseslint.config(
       "vue/singleline-html-element-content-newline": "off",
       "vue/max-attributes-per-line": "off",
       "vue/html-self-closing": "off",
+      "no-multiple-empty-lines": "error",
+      "vue/block-order": [
+        "error",
+        {
+          order: ["script", "template", "style", "i18n"],
+        },
+      ],
     },
     languageOptions: {
       sourceType: "module",
@@ -71,5 +91,12 @@ export default tseslint.config(
     },
   },
 
-  prettier,
-);
+  {
+    rules: {
+      "linebreak-style": ["error", "unix"],
+    },
+  },
+
+  unocss,
+  eslintConfigPrettier,
+) as ConfigArray;

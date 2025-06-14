@@ -12,6 +12,7 @@ const props = defineProps({
   left: Boolean,
   disabled: Boolean,
   focused: Boolean,
+  error: Boolean,
   magicKey: {
     type: String,
     required: false,
