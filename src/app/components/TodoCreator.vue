@@ -5,8 +5,10 @@ import Button from "./Button.vue";
 import { useTodoStore } from "../stores/todo";
 import { trpc } from "@/server/trpc/client";
 import { useToastStore } from "../stores/toast";
+import { z } from "zod/v4";
+import { TodoDataSchema } from "@/shared/schema/misc";
 
-const { info, warn } = useToastStore();
+const { info, warn, zWarn } = useToastStore();
 const { upsertTodos } = useTodoStore();
 
 const text = ref("");
@@ -16,22 +18,26 @@ const isProcessing = ref<boolean>(false);
 const handleCreate = async () => {
   if (isProcessing.value) return;
 
-  if (text.value.length === 0) {
-    warn("任务不能为空");
-    return;
-  }
-
-  isProcessing.value = true;
-  await trpc.todo.create
-    .mutate({
+  TodoDataSchema.omit({
+    id: true,
+  })
+    .parseAsync({
       text: text.value,
     })
-    .then((todo) => {
-      text.value = "";
-      upsertTodos(todo);
-      info("成功创建任务");
+    .then(async ({ text: pText }) => {
+      isProcessing.value = true;
+      await trpc.todo.create
+        .mutate({
+          text: pText!,
+        })
+        .then((todo) => {
+          text.value = "";
+          upsertTodos(todo);
+          info("成功创建任务");
+        })
+        .finally(() => (isProcessing.value = false));
     })
-    .finally(() => (isProcessing.value = false));
+    .catch(zWarn);
 };
 </script>
 

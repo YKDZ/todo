@@ -57,7 +57,7 @@ export const todoRouter = router({
       return z.array(TodoSchema).parse(
         await prisma.$transaction(async (tx) => {
           const result: Todo[] = [];
-          for (const { id, isCompleted, isImportant, deadline, text } of datas) {
+          for (const { id, isCompleted, isImportant, deadline, text, description } of datas) {
             result.push(
               await tx.todo.update({
                 where: {
@@ -67,6 +67,7 @@ export const todoRouter = router({
                   isCompleted,
                   isImportant,
                   text,
+                  description,
                   deadline: deadline !== undefined ? (deadline === null ? null : new Date(deadline)) : undefined,
                 },
               }),

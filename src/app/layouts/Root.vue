@@ -5,7 +5,7 @@ import Toast from "../components/Toast.vue";
 
 <template>
   <div
-    class="bg-highlight flex h-screen max-h-screen max-w-screen w-screen transition-colors duration-300 items-center justify-center overflow-hidden"
+    class="bg-highlight flex h-screen max-h-screen max-w-screen w-screen transition-colors duration-300 items-center justify-center"
   >
     <slot />
     <Toast />

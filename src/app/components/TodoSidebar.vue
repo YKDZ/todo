@@ -13,59 +13,72 @@ import DropdownMenu from "./dropdown/DropdownMenu.vue";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import { useDateFormat } from "@vueuse/core";
+import InputLabel from "./InputLabel.vue";
 
 const { info, trpcWarn } = useToastStore();
 
 const { isFree, isFolding } = storeToRefs(useSidebarStore());
-const { currentTodo } = storeToRefs(useTodoStore());
+const { pickedTodo } = storeToRefs(useTodoStore());
 
 const isProcessing = ref(false);
 const mouseInSidebar = ref(false);
 const { upsertTodos } = useTodoStore();
 
-const text = ref<string>(currentTodo.value?.text ?? "");
-const isCompleted = ref<boolean>(currentTodo.value?.isCompleted ?? false);
-const isImportant = ref<boolean>(currentTodo.value?.isImportant ?? false);
+const text = ref<string>(pickedTodo.value?.text ?? "");
+const description = ref<string>(pickedTodo.value?.description ?? "");
+const isCompleted = ref<boolean>(pickedTodo.value?.isCompleted ?? false);
+const isImportant = ref<boolean>(pickedTodo.value?.isImportant ?? false);
 const deadline = ref<Date | null>(null);
 
 const handleImportant = async () => {
-  if (!currentTodo.value) return;
+  if (!pickedTodo.value) return;
 
   const newTodo = TodoDataSchema.parse({
-    id: currentTodo.value.id,
-    isImportant: !currentTodo.value.isImportant,
+    id: pickedTodo.value.id,
+    isImportant: !pickedTodo.value.isImportant,
   });
 
   handleUpdate(newTodo);
 };
 
 const handleCompleted = async () => {
-  if (!currentTodo.value) return;
+  if (!pickedTodo.value) return;
 
   const newTodo = TodoDataSchema.parse({
-    id: currentTodo.value.id,
-    isCompleted: !currentTodo.value.isCompleted,
+    id: pickedTodo.value.id,
+    isCompleted: !pickedTodo.value.isCompleted,
   });
 
   await handleUpdate(newTodo);
 };
 
 const handleChangeText = async () => {
-  if (!currentTodo.value) return;
+  if (!pickedTodo.value) return;
 
   const newTodo = TodoDataSchema.parse({
-    id: currentTodo.value.id,
+    id: pickedTodo.value.id,
     text: text.value,
   });
 
   await handleUpdate(newTodo);
 };
 
-const handleChangeDeadline = async () => {
-  if (!currentTodo.value) return;
+const handleChangeDescription = async () => {
+  if (!pickedTodo.value) return;
 
   const newTodo = TodoDataSchema.parse({
-    id: currentTodo.value.id,
+    id: pickedTodo.value.id,
+    description: description.value,
+  });
+
+  await handleUpdate(newTodo);
+};
+
+const handleChangeDeadline = async () => {
+  if (!pickedTodo.value) return;
+
+  const newTodo = TodoDataSchema.parse({
+    id: pickedTodo.value.id,
     deadline: deadline.value ? new Date(deadline.value).toISOString() : null,
   });
 
@@ -77,7 +90,7 @@ const handleUpdate = async (newTodo: TodoData) => {
 
   isProcessing.value = true;
 
-  const oldTodo = currentTodo.value;
+  const oldTodo = pickedTodo.value;
 
   await trpc.todo.update
     .mutate({ datas: [newTodo] })
@@ -93,12 +106,12 @@ const handleUpdate = async (newTodo: TodoData) => {
 };
 
 const handleDelete = async () => {
-  if (!currentTodo.value) return;
+  if (!pickedTodo.value) return;
   if (isProcessing.value) return;
 
   isProcessing.value = true;
   await trpc.todo.delete
-    .mutate({ ids: [currentTodo.value.id] })
+    .mutate({ ids: [pickedTodo.value.id] })
     .then(() => {
       info("成功删除此任务");
     })
@@ -117,11 +130,12 @@ const deadlineToEndofXDayLater = (x: number) => {
 };
 
 watch(
-  currentTodo,
+  pickedTodo,
   (to) => {
     if (!to) isFree.value = true;
     else {
       text.value = to.text;
+      description.value = to.description ?? "";
       isCompleted.value = to.isCompleted;
       isImportant.value = to.isImportant;
       deadline.value = to.deadline ? new Date(to.deadline) : null;
@@ -135,7 +149,7 @@ watch(
 watch(
   isFolding,
   (to) => {
-    if (!to && !currentTodo.value) isFolding.value = true;
+    if (!to && !pickedTodo.value) isFolding.value = true;
   },
   { immediate: true },
 );
@@ -158,7 +172,10 @@ watch(
         </div>
         <!-- Middle -->
         <div class="px-7 pt-6 flex flex-col gap-2 w-full">
+          <InputLabel>任务</InputLabel>
           <Textarea v-model="text" full-width @change="handleChangeText" />
+          <InputLabel>描述</InputLabel>
+          <Textarea v-model="description" full-width @change="handleChangeDescription" />
           <DropdownMenu v-if="!deadline">
             <template #trigger><Button full-width icon="i-mdi:star">添加截止日期</Button></template>
             <template #content
@@ -218,8 +235,8 @@ watch(
       </div>
       <!-- Bottom -->
       <div class="px-4 flex h-14 w-full items-center justify-between">
-        <div v-if="currentTodo" class="text-center w-full">
-          创建于 {{ useDateFormat(currentTodo.createdAt, "YYYY-MM-DD") }}
+        <div v-if="pickedTodo" class="text-center w-full">
+          创建于 {{ useDateFormat(pickedTodo.createdAt, "YYYY-MM-DD") }}
         </div>
         <Button transparent icon="i-mdi:trash-can" small no-text @click="handleDelete" />
       </div>

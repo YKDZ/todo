@@ -20,7 +20,8 @@ const handleChange = () => {
 
 <template>
   <span
-    class="select-none bg-highlight-darker cursor-pointer inline-flex justify-center gap-1 items-center px-2 py-1 rounded-md text-sm text-highlight-content"
+    v-if="completedAmount > 0"
+    class="text-sm text-highlight-content px-2 py-1 rounded-md bg-highlight-darker inline-flex gap-1 cursor-pointer select-none items-center justify-center"
     @click="handleChange"
     >已完成 <span class="text-xs">{{ completedAmount }}</span>
     <Icon small :icon="isShowCompleted ? 'i-mdi:chevron-up' : 'i-mdi:chevron-down'" />

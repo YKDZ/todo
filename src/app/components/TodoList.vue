@@ -19,7 +19,7 @@ const handleDelete = (id: number) => {
 </script>
 
 <template>
-  <ul class="flex flex-col gap-0.5 w-full">
+  <ul class="flex flex-col gap-0.5 w-full overflow-visible">
     <TodoListItem v-for="todo in todos" :key="todo.id" :todo @update="handleUpdate" @delete="handleDelete" />
   </ul>
 </template>

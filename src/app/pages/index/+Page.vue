@@ -14,7 +14,7 @@ const { isShowCompleted } = storeToRefs(useProfileStore());
 </script>
 
 <template>
-  <div class="px-12 py-12 flex flex-col gap-2 h-full w-full items-center justify-between md:max-w-3/5">
+  <div class="px-12 py-12 flex flex-col gap-2 h-full w-full items-center justify-between overflow-visible md:max-w-3/5">
     <div class="flex w-full items-center justify-between"><TodoTitle class="mb-2" /> <TodoBatchTools /></div>
     <div class="flex flex-col gap-1 h-full w-full items-start overflow-y-auto">
       <TodoList :todos="sortedUncompletedTodos" />

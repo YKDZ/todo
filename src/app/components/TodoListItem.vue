@@ -21,7 +21,7 @@ const inputEl = ref<HTMLInputElement>();
 
 const isContainerHovered = useElementHover(containerEl);
 const { selectTodo } = useTodoStore();
-const { selectedTodoIds } = storeToRefs(useTodoStore());
+const { selectedTodoIds, pickedTodoId, isInMultiSelectMode } = storeToRefs(useTodoStore());
 
 const { focused } = useFocus(inputEl);
 
@@ -108,7 +108,8 @@ const handleStartInput = async () => {
 };
 
 const handleSelect = () => {
-  selectTodo(props.todo.id);
+  if (!isInMultiSelectMode.value) pickedTodoId.value = props.todo.id;
+  else selectTodo(props.todo.id);
 };
 
 const isSelected = computed(() => {
@@ -146,13 +147,14 @@ watch(
 <template>
   <li
     ref="containerEl"
-    class="text-highlight-content rounded-md bg-highlight-darker cursor-pointer overflow-x-hidden hover:bg-highlight-darkest"
+    class="text-highlight-content rounded-md bg-highlight-darker cursor-pointer relative overflow-visible hover:bg-highlight-darkest"
     :class="{
-      'bg-highlight-darkest': isSelected,
+      'bg-highlight-darkest border-l-4 border-base': isSelected,
     }"
+    @click="handleSelect"
   >
-    <div class="px-5 py-3 flex gap-5 items-center justify-between" @click.stop="handleSelect">
-      <Checkbox v-model="todoData.isCompleted" @change="handleCompleted" />
+    <div class="px-5 py-3 flex gap-5 items-center justify-between">
+      <Checkbox v-model="todoData.isCompleted" @change.stop="handleCompleted" />
       <div class="h-full w-full relative">
         <span
           v-if="!isInputing"

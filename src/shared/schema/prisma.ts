@@ -24,6 +24,7 @@ export const AccountSchema = z.object({
 export const TodoSchema = z.object({
   id: z.int(),
   text: z.string(),
+  description: z.string().nullable(),
   isCompleted: z.boolean(),
   isImportant: z.boolean(),
   deadline: PrimsaDateTime.nullable(),

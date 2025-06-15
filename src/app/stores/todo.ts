@@ -1,15 +1,16 @@
 import { trpc } from "@/server/trpc/client";
 import type { Todo } from "@/shared/schema/prisma";
 import { defineStore } from "pinia";
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 
 export const useTodoStore = defineStore("todo", () => {
   const todos = ref<Todo[]>([]);
   const selectedTodoIds = ref<number[]>([]);
+  const pickedTodoId = ref<number | null>(null);
+  const isInMultiSelectMode = ref(false);
 
-  const currentTodo = computed<Todo | null>(() => {
-    if (selectedTodoIds.value.length !== 1) return null;
-    return todos.value.find((todo) => todo.id === selectedTodoIds.value[0]) ?? null;
+  const pickedTodo = computed<Todo | null>(() => {
+    return todos.value.find((todo) => todo.id === pickedTodoId.value) ?? null;
   });
 
   const initTodos = (...todosInit: Todo[]) => {
@@ -78,6 +79,11 @@ export const useTodoStore = defineStore("todo", () => {
     else selectedTodoIds.value.splice(index, 1);
   };
 
+  watch(isInMultiSelectMode, (to) => {
+    if (!to) selectedTodoIds.value = [];
+    else pickedTodoId.value = null;
+  });
+
   return {
     todos,
     selectedTodoIds,
@@ -85,7 +91,9 @@ export const useTodoStore = defineStore("todo", () => {
     sortedUncompletedTodos,
     uncompletedAmount,
     completedAmount,
-    currentTodo,
+    pickedTodo,
+    pickedTodoId,
+    isInMultiSelectMode,
     deleteTodos,
     initTodos,
     upsertTodos,

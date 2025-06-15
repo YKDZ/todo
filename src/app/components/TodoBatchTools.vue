@@ -8,7 +8,7 @@ import DropdownMenu from "./dropdown/DropdownMenu.vue";
 import { TodoDataSchema, type TodoData } from "@/shared/schema/misc";
 import { z } from "zod/v4";
 
-const { selectedTodoIds, todos } = storeToRefs(useTodoStore());
+const { selectedTodoIds, todos, isInMultiSelectMode } = storeToRefs(useTodoStore());
 const { deleteTodos, upsertTodos } = useTodoStore();
 const { info, trpcWarn } = useToastStore();
 
@@ -103,6 +103,7 @@ const handleBatchDelete = async () => {
     })
     .then(() => {
       deleteTodos(...selectedTodoIds.value);
+      selectedTodoIds.value = [];
       info("成功删除所选的任务");
     })
     .catch(trpcWarn);
@@ -112,7 +113,7 @@ const handleBatchDelete = async () => {
 <template>
   <div class="flex gap-2 items-center">
     <Button
-      v-if="selectedTodoIds.length !== todos.length"
+      v-if="selectedTodoIds.length !== todos.length && isInMultiSelectMode"
       transparent
       no-text
       icon="i-mdi:select-all"
@@ -122,10 +123,10 @@ const handleBatchDelete = async () => {
       v-if="selectedTodoIds.length > 0"
       transparent
       no-text
-      icon="i-mdi:select-off"
+      icon="i-mdi:select-remove"
       @click="selectedTodoIds = []"
     />
-    <DropdownMenu v-if="selectedTodoIds.length > 1">
+    <DropdownMenu v-if="selectedTodoIds.length > 0">
       <template #trigger> <Button transparent icon="i-mdi:check-all" no-text /></template>
       <template #content>
         <div class="p-1">
@@ -138,7 +139,7 @@ const handleBatchDelete = async () => {
         </div>
       </template>
     </DropdownMenu>
-    <DropdownMenu v-if="selectedTodoIds.length > 1">
+    <DropdownMenu v-if="selectedTodoIds.length > 0">
       <template #trigger> <Button transparent icon="i-mdi:star" no-text /></template>
       <template #content>
         <div class="p-1">
@@ -151,6 +152,13 @@ const handleBatchDelete = async () => {
         </div>
       </template>
     </DropdownMenu>
-    <Button v-if="selectedTodoIds.length > 1" transparent icon="i-mdi:trash-can" no-text @click="handleBatchDelete" />
+    <Button v-if="selectedTodoIds.length > 0" transparent icon="i-mdi:trash-can" no-text @click="handleBatchDelete" />
+    <Button
+      v-if="todos.length > 0"
+      no-text
+      transparent
+      :icon="isInMultiSelectMode ? 'i-mdi:select-off' : 'i-mdi:select'"
+      @click="isInMultiSelectMode = !isInMultiSelectMode"
+    />
   </div>
 </template>
