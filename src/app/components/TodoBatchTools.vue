@@ -114,8 +114,8 @@ const handleBatchDelete = async () => {
   <div class="flex gap-2 items-center">
     <Button
       v-if="selectedTodoIds.length !== todos.length && isInMultiSelectMode"
-      transparent
-      no-text
+      
+       no-text transparent 
       icon="i-mdi:select-all"
       @click="selectedTodoIds = todos.map((todo) => todo.id)"
     />

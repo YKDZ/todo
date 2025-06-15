@@ -7,7 +7,7 @@ const props = defineProps<{
 
 <template>
   <span
-    class="inline-block aspect-ratio-square"
+    class="aspect-ratio-square inline-block"
     :class="[
       {
         'min-h-4 min-w-4': small,

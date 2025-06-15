@@ -5,10 +5,9 @@ import Button from "./Button.vue";
 import { useTodoStore } from "../stores/todo";
 import { trpc } from "@/server/trpc/client";
 import { useToastStore } from "../stores/toast";
-import { z } from "zod/v4";
 import { TodoDataSchema } from "@/shared/schema/misc";
 
-const { info, warn, zWarn } = useToastStore();
+const { info, trpcWarn, zWarn } = useToastStore();
 const { upsertTodos } = useTodoStore();
 
 const text = ref("");
@@ -35,6 +34,7 @@ const handleCreate = async () => {
           upsertTodos(todo);
           info("成功创建任务");
         })
+        .catch(trpcWarn)
         .finally(() => (isProcessing.value = false));
     })
     .catch(zWarn);

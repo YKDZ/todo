@@ -27,7 +27,7 @@ const modalValue = defineModel({ type: String });
 
 <template>
   <div
-    class="flex gap-1 items-center relative text-highlight-content"
+    class="text-highlight-content flex gap-1 items-center relative"
     :class="{
       'max-w-2/3': !fullWidth,
       'w-full': fullWidth,
@@ -38,7 +38,7 @@ const modalValue = defineModel({ type: String });
       v-model="modalValue"
       :type
       :placeholder
-      class="text-black px-3 color-highlight-content-darker outline-0 bg-transparent h-10 w-full select-none ring-1 ring-highlight-darkest ring-offset-transparent file:text-black file:font-bold file:font-medium file:mr-2 file:px-3 file:py-2 file:bg-neutral disabled:opacity-50 file:cursor-text disabled:cursor-not-allowed focus-visible:ring-base file:-ml-2.5"
+      class="text-black color-highlight-content-darker px-3 outline-0 bg-transparent h-10 w-full select-none ring-1 ring-highlight-darkest ring-offset-transparent file:text-black file:font-bold file:font-medium file:mr-2 file:px-3 file:py-2 file:bg-neutral disabled:opacity-50 file:cursor-text disabled:cursor-not-allowed focus-visible:ring-base file:-ml-2.5"
       :class="{
         'pl-8': icon,
         'rounded-md': !noRound,

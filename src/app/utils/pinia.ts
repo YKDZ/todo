@@ -1,5 +1,6 @@
-import { createPinia, Pinia } from "pinia";
-import { PageContextServer } from "vike/types";
+import type { Pinia } from "pinia";
+import { createPinia } from "pinia";
+import type { PageContextServer } from "vike/types";
 
 export const initPinia = () => {
   const pinia = createPinia();
